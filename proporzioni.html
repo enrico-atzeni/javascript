@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Do your proportion & get your result! By Enrico Atzeni</title>
+<meta name="description" content="A simple form to make that operation that we often hate but need. Does what you expect it does!" />
+<meta name="viewport" content="width=device-width" />
+<body>
+
+<style type="text/css">
+body{
+	margin: 0;
+    padding: 20px 5% 50px;
+    background: #000;
+    color: #09f;
+    font-size: 3vw;
+}
+h1{
+	margin-top: 0;
+	font-size: 4.5vw;
+}
+#content-wrapper:after{
+	clear:both;
+	display:block;
+	content:'';
+}
+#content-wrapper{
+	text-align: center;
+}
+#content-wrapper *, input#calccost{
+	font-size: 3vw;
+	padding: 10px 0;
+}
+#content-wrapper span{
+	display:block;
+	width: 3.33%;
+	float:left;
+    font-weight: 700;
+}
+#content-wrapper input, input#calccost{
+	width: 22%;
+	float: left;
+	border: 0;
+	text-align: center;
+	color: #039;
+}
+input#calccost{
+	width: 100%;
+	margin: 10px 0;
+}
+span#resultWrapper, #notice3{
+    font-size: 7vw;
+    text-align: center;
+    display: block;
+    background: #069;
+    color: #fff;
+    font-weight: 700;
+    margin: 10px 0;
+    padding: 15px 0;
+}
+input[type="button"]{
+	font-size: 3vw;
+    width: 100%;
+    padding: 14px;
+    background: #09f;
+    border: 0;
+}
+input:focus{
+	background: #09f !important;
+    color: #000 !important;
+}
+input[type="button"]:hover{
+	background: #069 !important;
+	color: #fff !important;
+}
+@media (max-width: 800px){
+	body{
+		font-size: 21px;
+	}
+	h1{
+		font-size: 36px;
+		line-height: 36px;
+	}
+	#content-wrapper *, input#calccost{
+	    font-size: 39px;
+	    padding: 20px 0;
+	}
+	#content-wrapper input{
+		width: 46%;
+	}
+	#content-wrapper span{
+		width: 8%;
+	}
+	#content-wrapper span.like{
+		width: 100%;
+		font-size: 60px;
+		line-height:20px;
+	}
+	span#resultWrapper, #notice3{
+		font-size: 37px;
+	}
+	input[type="button"]{
+		font-size: 21px;
+	}
+}
+</style>
+<!-- 
+<p>Modify the text in the input field, then click outside the field to fire the onchange event.</p>
+-->
+<h1>Do your proportion & get your result!</h1>
+<div id="content-wrapper">
+	<input class="inputs haveNext" id="first" tabindex="1" type="number" name="x" placeholder="x" onchange="myFunction(this.name,this.value)">
+	<span> : </span>
+	<input class="inputs haveNext" type="number" name="y" placeholder="y" onchange="myFunction(this.name,this.value)">
+	
+	<span class="like"> = </span>
+	
+	<input class="inputs haveNext" type="number" name="xx" placeholder="xx" onchange="myFunction(this.name,this.value)">
+	<span> : </span>
+	<input class="inputs" id="last" type="number" name="yy" placeholder="yy" onchange="myFunction(this.name,this.value)">
+</div>
+
+<br />
+<span>Your result is:</span>
+<br />
+<span id="resultWrapper">-</span>
+<span id="notice">You must insert at least other 3 numbers</span>
+<br />
+<span id="notice2"></span>
+<br /><br />
+<input type="button" value="Reset" onclick="reset()"></input>
+<script type="text/javascript">
+var x = y = xx = yy = null,
+	d = document.getElementById('notice'),
+	resultWrapper = document.getElementById('resultWrapper'),
+	d2 = document.getElementById('notice2'),
+	_op = '/', _cost = 0,
+	first = document.getElementById('first');
+
+
+function reset(){
+	document.location.reload();
+}
+
+function check_complete(){
+	var c=3;
+	if(x != null)
+		c--;
+	if(y != null)
+		c--;
+	if(xx != null)
+		c--;
+	if(yy != null)
+		c--;
+	console.log('c ',c);
+	
+
+	if(c <= 0){
+		return true;
+	}else{
+		d.innerHTML = 'You must insert at least other '+c+' numbers.';
+		return false;
+	}
+}
+
+function doCostante(op,cost){
+	if(cost == 0)
+		return;
+
+	d2.innerHTML = 'Use the costant of this proportion to calculate future numbers.<br />'
+					+'Insert the value you want to calculate in the field below and the press "Calculate with costant".<br />'
+					+'Costant: <b>'+cost+'</b><br />'
+					+'operator: <b>'+op+'</b><br />'
+					+'<input type="number" id="calccost" placeholder="new number..." /><input type="button" value="Calculate with costant" onclick="cwc()"></input><br />'
+					+'<span id="notice3"></span>';
+
+	_op = op;
+	_cost = cost;
+
+	document.getElementById('calccost').addEventListener('keypress',cwc);
+}
+
+function cwc(){
+	var costel = document.getElementById('calccost');
+	var costval = costel.value;
+	var cost = null;
+
+	window.scrollTo(0,costel.getBoundingClientRect().top);
+
+	if(! (cost = parseInt(costval)) ){
+		//alert('The value is not a number, please insert a correct value.');
+		return;
+	}
+
+	var notice3 = document.getElementById('notice3');
+	if(_op == '/'){
+		notice3.innerHTML = cost / _cost;	
+	}else if(_op == '*'){
+		notice3.innerHTML = cost * _cost;	
+	}
+}
+
+function do_proportion(){
+	var res=0, cost = 0, op = '/';
+	//a=x, b=y, c=xx, d=yy
+	//case 1 a:b = c : x
+	if( x != null && y != null && xx != null ){
+		res = y*xx / x;
+		cost = x / y;
+		op = '/';
+	}else
+	//case 2 a:b = x : d
+	if( x != null && y != null && yy != null ){
+		res = x*yy / y;
+		cost = x / y;
+		op = '*';
+	}else
+	//case 3 x:b = c : d
+	if( y != null && xx != null && yy != null ){
+		res = y*xx / yy;
+		cost = x / y;
+		op = '*';
+	}else
+	//case 4 a:x = c : d
+	if( x != null && xx != null && yy != null ){
+		res = x*yy / xx;
+		cost = x / y;
+		op = '/';
+	}
+
+
+	if(res != 0){
+		d.innerHTML = '';
+		resultWrapper.innerHTML = res.toFixed(3);
+		doCostante(op,cost);
+		document.getElementById("calccost").focus();
+		window.scrollTo(0,resultWrapper.getBoundingClientRect().top);
+	}else{
+		d.innerHTML = "C'è stato un errore, riprovare con un'altra configurazione di x:y=xx:yy";
+	}
+	return res;
+}
+
+function insertValue(name,v){
+	switch(name){
+    	case 'x':
+    		if(x == null)
+    			x = v;
+    	break;
+    	case 'y':
+    		if(y == null)
+    			y = v;
+    	break;
+    	case 'xx':
+    		if(xx == null)
+    			xx = v;
+    	break;
+    	case 'yy':
+    		if(yy == null)
+    			yy = v;
+    	break;
+    }
+    if(check_complete())
+    	do_proportion();
+}
+
+function myFunction(name,val) {
+	var v;
+    if(!(v = parseInt(val))){
+    	alert('The value inserted is not a number')
+    	insertValue(name,null);
+    }
+    //console.log(v);
+    insertValue(name,v);
+}
+
+function handleEnterKey(e){
+	//console.log(this,e);
+	if (e.keyCode == 13) {
+        //focus the next element
+        //if(this.id=="last"){
+        //	document.getElementById("calccost").focus();
+        //}else{
+	        this.nextElementSibling.nextElementSibling.focus();
+	    //}
+    }
+    return false;
+}
+
+function addEnterEventListener(){
+	var inputs = document.getElementsByClassName('inputs');
+	//console.log(inputs);
+	var i;
+	for (i = 0; i < inputs.length; i++) {
+	    if(inputs[i].addEventListener){
+			inputs[i].addEventListener('keypress',handleEnterKey);
+		}
+		else{
+			inputs[i].onkeypress = handleEnterKey;
+		}
+	}
+}
+
+
+
+first.focus();
+
+addEnterEventListener();
+
+
+
+
+</script>
+
+</body>
+</html>
